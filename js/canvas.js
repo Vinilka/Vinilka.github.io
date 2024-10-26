@@ -1,7 +1,7 @@
-import { Player } from './Player';
-import { DialogueManager } from './DialogueManager'; 
-import { Platform } from './Platform';
-import { GenericObject } from './GenericObject';
+import { Player } from './Player.js';
+import { DialogueManager } from './DialogueManager.js'; 
+import { Platform } from './Platform.js';
+import { GenericObject } from './GenericObject.js';
 import { createImage } from './createImage';
 
 import platform from '../img/platform.png'

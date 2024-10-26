@@ -1,3 +1,3 @@
 import './style.css'
-import './js/canvas'
+import './js/canvas.js'
 
