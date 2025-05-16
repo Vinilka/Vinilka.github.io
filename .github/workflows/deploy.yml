@@ -23,8 +23,12 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: dist
+      - name: Copy dist to root
+        run: |
+          cp -r dist/* ./
+          rm -rf dist
+          git config --global user.name "Vinilka"
+          git config --global user.email "you@example.com"
+          git add .
+          git commit -m "Auto-deploy via GitHub Actions" || echo "No changes"
+          git push
