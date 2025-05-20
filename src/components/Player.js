@@ -1,10 +1,10 @@
-import { createImage } from './createImage';
-import playerStandRight from '../img/playerStandRight.png';
-import playerStandLeft from '../img/playerStandLeft.png';
-import playerRunRight from '../img/playerMoveRight.png';
-import playerRunLeft from '../img/playerMoveLeft.png';
-import playerJumpRight from '../img/playerJumpRight.png';
-import playerJumpLeft from '../img/playerJumpLeft.png';
+import { createImage } from "../utils/createImage";
+import playerStandRight from "../img/playerStandRight.png";
+import playerStandLeft from "../img/playerStandLeft.png";
+import playerRunRight from "../img/playerMoveRight.png";
+import playerRunLeft from "../img/playerMoveLeft.png";
+import playerJumpRight from "../img/playerJumpRight.png";
+import playerJumpLeft from "../img/playerJumpLeft.png";
 
 export class Player {
   constructor({ canvas, context, gravity }) {
@@ -14,11 +14,11 @@ export class Player {
     this.gravity = gravity;
     this.position = {
       x: 100,
-      y: 100
+      y: 100,
     };
     this.velocity = {
       x: 0,
-      y: 1
+      y: 1,
     };
     this.width = 134;
     this.height = 150;
@@ -30,18 +30,18 @@ export class Player {
       stand: {
         right: createImage(playerStandRight),
         left: createImage(playerStandLeft),
-        cropWidth: 387.375
+        cropWidth: 387.375,
       },
       run: {
         right: createImage(playerRunRight),
         left: createImage(playerRunLeft),
-        cropWidth: 395
+        cropWidth: 395,
       },
       jump: {
         right: createImage(playerJumpRight),
         left: createImage(playerJumpLeft),
-        cropWidth: 395
-      }
+        cropWidth: 395,
+      },
     };
 
     this.currentSprite = this.sprites.stand.right;
@@ -67,17 +67,20 @@ export class Player {
 
     if (
       this.frames >= 16 &&
-      (this.currentSprite === this.sprites.stand.right || this.currentSprite === this.sprites.stand.left)
+      (this.currentSprite === this.sprites.stand.right ||
+        this.currentSprite === this.sprites.stand.left)
     ) {
       this.frames = 0;
     } else if (
       this.frames >= 20 &&
-      (this.currentSprite === this.sprites.run.right || this.currentSprite === this.sprites.run.left)
+      (this.currentSprite === this.sprites.run.right ||
+        this.currentSprite === this.sprites.run.left)
     ) {
       this.frames = 0;
     } else if (
       this.frames >= 30 &&
-      (this.currentSprite === this.sprites.jump.right || this.currentSprite === this.sprites.jump.left)
+      (this.currentSprite === this.sprites.jump.right ||
+        this.currentSprite === this.sprites.jump.left)
     ) {
       this.frames = 0;
     }
@@ -86,10 +89,10 @@ export class Player {
   update() {
     this.draw();
     this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;;
+    this.position.y += this.velocity.y;
 
-    if (this.position.y + this.height + this.velocity.y <= this.canvas.height){ 
+    if (this.position.y + this.height + this.velocity.y <= this.canvas.height) {
       this.velocity.y += this.gravity;
-    } 
+    }
   }
 }

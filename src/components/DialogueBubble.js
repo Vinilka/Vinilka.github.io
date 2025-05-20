@@ -1,4 +1,4 @@
-import { createImage } from './createImage';
+import { createImage } from "../src/utils/createImage";
 
 export class DialogueBubble {
   constructor(imageSrc, x, y, context) {
@@ -6,7 +6,7 @@ export class DialogueBubble {
     this.image = createImage(imageSrc);
     this.position = {
       x,
-      y
+      y,
     };
     this.width = 280;
     this.height = 180;
@@ -27,7 +27,6 @@ export class DialogueBubble {
     this.messageIndex = 0;
     this.messageVisible = true;
     setTimeout(() => this.typeMessage(), this.textStartDelay);
-
   }
 
   typeMessage() {
@@ -44,10 +43,22 @@ export class DialogueBubble {
       }
 
       this.context.save();
-      this.context.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+      this.context.translate(
+        this.position.x + this.width / 2,
+        this.position.y + this.height / 2
+      );
       this.context.scale(this.scale, this.scale);
-      this.context.translate(-(this.position.x + this.width / 2), -(this.position.y + this.height / 2));
-      this.context.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
+      this.context.translate(
+        -(this.position.x + this.width / 2),
+        -(this.position.y + this.height / 2)
+      );
+      this.context.drawImage(
+        this.image,
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+      );
       this.context.restore();
 
       this.context.fillStyle = "#1d6c7a";
@@ -63,20 +74,20 @@ export class DialogueBubble {
   }
 
   wrapText(text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
+    const words = text.split(" ");
+    let line = "";
     let lines = [];
-    let testLine = '';
+    let testLine = "";
     let metrics = null;
     let testWidth = 0;
 
     for (let i = 0; i < words.length; i++) {
-      testLine = line + words[i] + ' ';
+      testLine = line + words[i] + " ";
       metrics = this.context.measureText(testLine);
       testWidth = metrics.width;
       if (testWidth > maxWidth && i > 0) {
         lines.push(line);
-        line = words[i] + ' ';
+        line = words[i] + " ";
       } else {
         line = testLine;
       }
