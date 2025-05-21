@@ -1,4 +1,4 @@
-import { createImage } from "../src/utils/createImage.js";
+import { createImage } from "../utils/createImage.js";
 
 export class DialogueBubble {
   constructor(imageSrc, x, y, context) {
