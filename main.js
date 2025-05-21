@@ -1,5 +1,4 @@
 import "./style.css";
-import "./js/canvas.js";
-import { initGame } from "./src/scenes/canvas.js";
+import { initGame } from "./src/scenes/gameScene.js";
 
 initGame();
