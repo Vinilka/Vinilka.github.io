@@ -1,4 +1,4 @@
-import { DialogueBubble } from './DialogueBubble';
+import { DialogueBubble } from "../components/DialogueBubble.js";
 
 export class DialogueManager {
   constructor(context) {
@@ -19,7 +19,7 @@ export class DialogueManager {
   }
 
   resetDialogues() {
-    this.dialogues.forEach(dialogue => {
+    this.dialogues.forEach((dialogue) => {
       dialogue.shown = false;
       dialogue.bubble.messageVisible = false;
       dialogue.bubble.messageIndex = 0;
@@ -28,14 +28,14 @@ export class DialogueManager {
   }
 
   updatePositions(offset) {
-    this.dialogues.forEach(dialogue => {
+    this.dialogues.forEach((dialogue) => {
       dialogue.bubble.position.x += offset.x;
       dialogue.bubble.position.y += offset.y;
     });
   }
 
   draw() {
-    this.dialogues.forEach(dialogue => {
+    this.dialogues.forEach((dialogue) => {
       if (dialogue.shown) {
         dialogue.bubble.draw();
       }
