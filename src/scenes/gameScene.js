@@ -5,11 +5,11 @@ import { GenericObject } from "../components/GenericObject.js";
 import { createImage } from "../utils/createImage.js";
 import { setupInputHandlers } from "../utils/inputHandler.js";
 
-import platform from "../img/platform.png";
-import hills from "../img/hills.png";
-import background from "../img/background.png";
-import platformSmallTall from "../img/platformSmallTall.png";
-import dialogueBoxRight from "../img/dialogueBoxRight.png";
+import platform from "../assets/platform.png";
+import hills from "../assets/hills.png";
+import background from "../assets/background.png";
+import platformSmallTall from "../assets/platformSmallTall.png";
+import dialogueBoxRight from "../assets/dialogueBoxRight.png";
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");

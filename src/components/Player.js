@@ -1,10 +1,10 @@
 import { createImage } from "../utils/createImage";
-import playerStandRight from "../img/playerStandRight.png";
-import playerStandLeft from "../img/playerStandLeft.png";
-import playerRunRight from "../img/playerMoveRight.png";
-import playerRunLeft from "../img/playerMoveLeft.png";
-import playerJumpRight from "../img/playerJumpRight.png";
-import playerJumpLeft from "../img/playerJumpLeft.png";
+import playerStandRight from "../assets/playerStandRight.png";
+import playerStandLeft from "../assets/playerStandLeft.png";
+import playerRunRight from "../assets/playerMoveRight.png";
+import playerRunLeft from "../assets/playerMoveLeft.png";
+import playerJumpRight from "../assets/playerJumpRight.png";
+import playerJumpLeft from "../assets/playerJumpLeft.png";
 
 export class Player {
   constructor({ canvas, context, gravity }) {
