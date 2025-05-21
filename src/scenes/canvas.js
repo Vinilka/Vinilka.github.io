@@ -255,9 +255,11 @@ function animate() {
   }
 }
 
-init();
-animate();
-
 setupInputHandlers(keys, player, (key) => {
   lastKey = key;
 });
+
+export function initGame() {
+  init();
+  animate();
+}
