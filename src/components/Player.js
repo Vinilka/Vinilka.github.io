@@ -1,4 +1,4 @@
-import { createImage } from "../utils/createImage";
+import { createImage } from "../utils/createImage.js";
 import playerStandRight from "../assets/playerStandRight.png";
 import playerStandLeft from "../assets/playerStandLeft.png";
 import playerRunRight from "../assets/playerMoveRight.png";
