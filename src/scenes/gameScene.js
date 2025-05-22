@@ -29,6 +29,11 @@ let scrollPlatform = 0;
 // function after dying//
 function init() {
   const level = createLevel(c, canvas, gravity);
+  let player;
+  let platforms = [];
+  let dialogueManager;
+  let backgroundObjects = [];
+  let platformImage;
   player = level.player;
   platforms = level.platforms;
   genericObject = level.backgroundObjects;
