@@ -1,5 +1,56 @@
 import { setupInputHandlers } from "../utils/inputHandler.js";
 import { createLevel } from "../factories/levelFactory.js";
+import { GameState } from "../managers/GameState.js";
+
+let frameCount = 0;
+
+function showLoadingScreen() {
+  const existing = document.getElementById("loading-screen");
+  if (existing) existing.remove();
+
+  const loadingScreen = document.createElement("div");
+  loadingScreen.id = "loading-screen";
+  loadingScreen.innerHTML = `
+    <p class="loading-text">Подгружаю мир Анастасии<span class="dots"></span></p>
+  `;
+  document.body.appendChild(loadingScreen);
+}
+
+const style = document.createElement("style");
+style.innerHTML = `
+  #loading-screen {
+    position: fixed;
+    inset: 0;
+    background-color: #cceeff;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease;
+    opacity: 1;
+  }
+
+  .loading-text {
+    font-family: 'Patrick Hand', sans-serif;
+    font-size: 26px;
+    color: white;
+    letter-spacing: 1px;
+  }
+
+  .dots::after {
+    content: '';
+    display: inline-block;
+    animation: dots 1.2s infinite steps(3, end);
+  }
+
+  @keyframes dots {
+    0%   { content: ''; }
+    33%  { content: '.'; }
+    66%  { content: '..'; }
+    100% { content: '...'; }
+  }
+`;
+document.head.appendChild(style);
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -26,17 +77,18 @@ const keys = {
 
 let scrollPlatform = 0;
 
+let player;
+let platforms = [];
+let dialogueManager;
+let backgroundObjects = [];
+let platformImage;
+
 // function after dying//
 function init() {
   const level = createLevel(c, canvas, gravity);
-  let player;
-  let platforms = [];
-  let dialogueManager;
-  let backgroundObjects = [];
-  let platformImage;
   player = level.player;
   platforms = level.platforms;
-  genericObject = level.backgroundObjects;
+  backgroundObjects = level.backgroundObjects;
   dialogueManager = level.dialogueManager;
   platformImage = level.platformImage;
   scrollPlatform = 0;
@@ -45,24 +97,7 @@ function init() {
   });
 }
 
-function animate() {
-  requestAnimationFrame(animate);
-  c.fillStyle = "white";
-  c.fillRect(0, 0, canvas.width, canvas.height);
-
-  backgroundObjects.forEach((backgroundObjects) => {
-    backgroundObjects.draw();
-  });
-
-  dialogueManager.draw(); // draw the message bubble
-
-  platforms.forEach((platform) => {
-    platform.draw();
-  });
-
-  player.updatePlayerFrame();
-  player.update();
-
+function handlePlayerMovement() {
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = player.speed;
   } else if (
@@ -72,13 +107,14 @@ function animate() {
     player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
+
     if (keys.right.pressed) {
       scrollPlatform += player.speed;
       platforms.forEach((platform) => {
         platform.position.x -= player.speed;
       });
-      backgroundObjects.forEach((backgroundObjects) => {
-        backgroundObjects.position.x -= player.speed * 0.66;
+      backgroundObjects.forEach((obj) => {
+        obj.position.x -= player.speed * 0.66;
       });
       dialogueManager.updatePositions({ x: -player.speed * 0.66, y: 0 });
     } else if (keys.left.pressed && scrollPlatform > 0) {
@@ -86,14 +122,15 @@ function animate() {
       platforms.forEach((platform) => {
         platform.position.x += player.speed;
       });
-      backgroundObjects.forEach((backgroundObjects) => {
-        backgroundObjects.position.x += player.speed * 0.66;
+      backgroundObjects.forEach((obj) => {
+        obj.position.x += player.speed * 0.66;
       });
       dialogueManager.updatePositions({ x: player.speed * 0.66, y: 0 });
     }
   }
+}
 
-  // platfrom collision //
+function handleCollisions() {
   platforms.forEach((platform) => {
     if (
       player.position.y + player.height <= platform.position.y &&
@@ -106,16 +143,18 @@ function animate() {
       player.jumpCount = 0;
     }
   });
+}
 
-  // Check if player reaches the dialogue trigger points
+function handleDialogues() {
   if (player.position.x > 200 && !dialogueManager.dialogues[0].shown) {
-    dialogueManager.showDialogue(0); // Show the first dialogue bubble
+    dialogueManager.showDialogue(0);
   }
   if (player.position.x > 600 && !dialogueManager.dialogues[1].shown) {
-    dialogueManager.showDialogue(1); // Show the second dialogue bubble
+    dialogueManager.showDialogue(1);
   }
+}
 
-  // sprite switch //
+function handleSpriteSwitch() {
   if (keys.up.pressed) {
     player.frames = 1;
     if (lastKey === "right") {
@@ -158,20 +197,59 @@ function animate() {
     player.currentSprite = player.sprites.stand.right;
     player.currentCropWidth = player.sprites.stand.cropWidth;
   }
+}
 
-  // win condition //
+function checkWinLoseConditions() {
   if (scrollPlatform > platformImage.width * 5 + 300) {
-    console.log("you win");
+    console.log("🎉 You win");
   }
 
-  // lose condition //
-  if (player.position.y > canvas.height && GameState.isRunning) {
+  if (player.position.y > canvas.height) {
     GameState.reset();
     init();
   }
 }
 
+function animate() {
+  requestAnimationFrame(animate);
+
+  frameCount++;
+  if (frameCount === 2) {
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) {
+      loadingScreen.style.opacity = "0";
+      setTimeout(() => loadingScreen.remove(), 600);
+    }
+  }
+
+  c.fillStyle = "white";
+  c.fillRect(0, 0, canvas.width, canvas.height);
+
+  backgroundObjects.forEach((obj) => {
+    obj.draw();
+  });
+
+  dialogueManager.draw(); // draw the message bubble
+
+  platforms.forEach((platform) => {
+    platform.draw();
+  });
+
+  player.updatePlayerFrame();
+  player.update();
+
+  handlePlayerMovement();
+  handleCollisions();
+  handleDialogues();
+  handleSpriteSwitch();
+  checkWinLoseConditions();
+}
+
 export function initGame() {
-  init();
-  animate();
+  showLoadingScreen();
+  frameCount = 0;
+  setTimeout(() => {
+    init();
+    animate();
+  }, 0);
 }
