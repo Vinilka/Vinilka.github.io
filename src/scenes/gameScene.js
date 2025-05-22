@@ -1,15 +1,5 @@
-import { Player } from "../components/Player.js";
-import { DialogueManager } from "../managers/DialogueManager.js";
-import { Platform } from "../components/Platform.js";
-import { GenericObject } from "../components/GenericObject.js";
-import { createImage } from "../utils/createImage.js";
 import { setupInputHandlers } from "../utils/inputHandler.js";
-
-import platform from "../assets/platform.png";
-import hills from "../assets/hills.png";
-import background from "../assets/background.png";
-import platformSmallTall from "../assets/platformSmallTall.png";
-import dialogueBoxRight from "../assets/dialogueBoxRight.png";
+import { createLevel } from "../factories/levelFactory.js";
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -20,14 +10,6 @@ canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
 const gravity = 1.1;
-
-let platformImage = createImage(platform);
-let platformSmallTallImage = createImage(platformSmallTall);
-
-let player;
-let platforms = [];
-let dialogueManager;
-let genericObject = [];
 
 let lastKey;
 const keys = {
@@ -44,125 +26,18 @@ const keys = {
 
 let scrollPlatform = 0;
 
-// Create start and restart buttons dynamically
-const startBtn = document.createElement("button");
-startBtn.id = "startBtn";
-startBtn.innerText = "▶️ Начать игру";
-startBtn.style.position = "fixed";
-startBtn.style.top = "20px";
-startBtn.style.right = "20px";
-startBtn.style.zIndex = "10";
-document.body.appendChild(startBtn);
-
-const restartBtn = document.createElement("button");
-restartBtn.id = "restartBtn";
-restartBtn.innerText = "🔁 Начать сначала";
-restartBtn.style.position = "fixed";
-restartBtn.style.top = "60px";
-restartBtn.style.right = "20px";
-restartBtn.style.zIndex = "10";
-restartBtn.style.display = "none";
-document.body.appendChild(restartBtn);
-
-startBtn.addEventListener("click", () => {
-  startBtn.style.display = "none";
-  GameState.reset();
-  init();
-  animate();
-});
-
-restartBtn.addEventListener("click", () => {
-  GameState.reset();
-  init();
-  restartBtn.style.display = "none";
-});
-
 // function after dying//
 function init() {
-  platformImage = createImage(platform);
-
-  restartBtn.style.display = "none";
-
-  player = new Player({ canvas, context: c, gravity });
-  platforms = [
-    new Platform({
-      x: platformImage.width * 4 + 250,
-      y: 270,
-      image: platformSmallTallImage,
-      context: c,
-    }),
-    new Platform({
-      x: 0,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-    new Platform({
-      x: platformImage.width,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-    new Platform({
-      x: platformImage.width * 2,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-    new Platform({
-      x: platformImage.width * 3,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-    new Platform({
-      x: platformImage.width * 4,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-    new Platform({
-      x: platformImage.width * 5 + 200,
-      y: 470,
-      image: platformImage,
-      context: c,
-    }),
-  ];
-
-  genericObject = [
-    new GenericObject({
-      x: 0,
-      y: 0,
-      image: createImage(background),
-      context: c,
-    }),
-    new GenericObject({
-      x: 0,
-      y: 0,
-      image: createImage(hills),
-      context: c,
-    }),
-  ];
-
-  if (!dialogueManager) {
-    dialogueManager = new DialogueManager(c);
-    dialogueManager.addDialogue(
-      dialogueBoxRight,
-      750,
-      60,
-      "Hello there! I'm Anastasia. Welcome to my game!"
-    );
-    dialogueManager.addDialogue(
-      dialogueBoxRight,
-      1050,
-      60,
-      "I am passionate about programming and good looking designs"
-    );
-  } else {
-    dialogueManager.resetDialogues();
-  }
-
+  const level = createLevel(c, canvas, gravity);
+  player = level.player;
+  platforms = level.platforms;
+  genericObject = level.backgroundObjects;
+  dialogueManager = level.dialogueManager;
+  platformImage = level.platformImage;
   scrollPlatform = 0;
+  setupInputHandlers(keys, player, (key) => {
+    lastKey = key;
+  });
 }
 
 function animate() {
@@ -170,17 +45,11 @@ function animate() {
   c.fillStyle = "white";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  genericObject.forEach((genericObject) => {
-    genericObject.draw();
+  backgroundObjects.forEach((backgroundObjects) => {
+    backgroundObjects.draw();
   });
 
   dialogueManager.draw(); // draw the message bubble
-
-  if (scrollPlatform > platformImage.width * 5 + 300 && !GameState.isFinished) {
-    GameState.finish();
-    console.log("🎉 You reached the end!");
-    restartBtn.style.display = "block";
-  }
 
   platforms.forEach((platform) => {
     platform.draw();
@@ -203,8 +72,8 @@ function animate() {
       platforms.forEach((platform) => {
         platform.position.x -= player.speed;
       });
-      genericObject.forEach((genericObject) => {
-        genericObject.position.x -= player.speed * 0.66;
+      backgroundObjects.forEach((backgroundObjects) => {
+        backgroundObjects.position.x -= player.speed * 0.66;
       });
       dialogueManager.updatePositions({ x: -player.speed * 0.66, y: 0 });
     } else if (keys.left.pressed && scrollPlatform > 0) {
@@ -212,8 +81,8 @@ function animate() {
       platforms.forEach((platform) => {
         platform.position.x += player.speed;
       });
-      genericObject.forEach((genericObject) => {
-        genericObject.position.x += player.speed * 0.66;
+      backgroundObjects.forEach((backgroundObjects) => {
+        backgroundObjects.position.x += player.speed * 0.66;
       });
       dialogueManager.updatePositions({ x: player.speed * 0.66, y: 0 });
     }
@@ -296,10 +165,6 @@ function animate() {
     init();
   }
 }
-
-setupInputHandlers(keys, player, (key) => {
-  lastKey = key;
-});
 
 export function initGame() {
   init();
