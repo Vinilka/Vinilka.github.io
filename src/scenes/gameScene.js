@@ -44,9 +44,44 @@ const keys = {
 
 let scrollPlatform = 0;
 
+// Create start and restart buttons dynamically
+const startBtn = document.createElement("button");
+startBtn.id = "startBtn";
+startBtn.innerText = "▶️ Начать игру";
+startBtn.style.position = "fixed";
+startBtn.style.top = "20px";
+startBtn.style.right = "20px";
+startBtn.style.zIndex = "10";
+document.body.appendChild(startBtn);
+
+const restartBtn = document.createElement("button");
+restartBtn.id = "restartBtn";
+restartBtn.innerText = "🔁 Начать сначала";
+restartBtn.style.position = "fixed";
+restartBtn.style.top = "60px";
+restartBtn.style.right = "20px";
+restartBtn.style.zIndex = "10";
+restartBtn.style.display = "none";
+document.body.appendChild(restartBtn);
+
+startBtn.addEventListener("click", () => {
+  startBtn.style.display = "none";
+  GameState.reset();
+  init();
+  animate();
+});
+
+restartBtn.addEventListener("click", () => {
+  GameState.reset();
+  init();
+  restartBtn.style.display = "none";
+});
+
 // function after dying//
 function init() {
   platformImage = createImage(platform);
+
+  restartBtn.style.display = "none";
 
   player = new Player({ canvas, context: c, gravity });
   platforms = [
@@ -140,6 +175,12 @@ function animate() {
   });
 
   dialogueManager.draw(); // draw the message bubble
+
+  if (scrollPlatform > platformImage.width * 5 + 300 && !GameState.isFinished) {
+    GameState.finish();
+    console.log("🎉 You reached the end!");
+    restartBtn.style.display = "block";
+  }
 
   platforms.forEach((platform) => {
     platform.draw();
