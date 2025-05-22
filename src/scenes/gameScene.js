@@ -250,7 +250,8 @@ function animate() {
   }
 
   // lose condition //
-  if (player.position.y > canvas.height) {
+  if (player.position.y > canvas.height && GameState.isRunning) {
+    GameState.reset();
     init();
   }
 }
